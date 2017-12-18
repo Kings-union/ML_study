@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import func_pandas
 
 titanic_survival = pd.read_csv("titanic_train.csv")
 titanic_survival.head()
@@ -53,7 +54,17 @@ titanic_survival.head()
 # print(row_index_83_age)
 
 new_titanic_survival = titanic_survival.sort_values("Age", ascending=False)
-print(new_titanic_survival[0:10])
+# print(new_titanic_survival[0:10])
 titanic_reindexed = new_titanic_survival.reset_index(drop=True)
-print('_________________')
-print(titanic_reindexed.loc[0:10])
+# print('_________________')
+# print(titanic_reindexed.loc[0:10])
+
+
+hundredth_row = titanic_reindexed.apply(func_pandas.hundredth_row)
+print(hundredth_row)
+
+# column_null_count = titanic_survival.apply(func_pandas.not_null_count)
+# print(column_null_count)
+
+
+
