@@ -9,7 +9,7 @@ deliveryData = genfromtxt(datapath, delimiter=',')
 
 X = deliveryData[:, :-1]
 Y = deliveryData[:, -1]
-# print("X:",X,"Y",Y)
+print("X:",X,"Y",Y)
 print(deliveryData)
 print(X)
 

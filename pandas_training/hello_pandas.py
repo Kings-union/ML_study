@@ -1,27 +1,27 @@
 import pandas
 
 food_info = pandas.read_csv("food_info.csv")
-#print(type(food_info))
-#print(food_info.dtypes)
-#print(pandas_training.read_csv)
+# print(type(food_info))
+# print(food_info.dtypes)
+# print(food_info)
 
 # display the first n line of the sample
-#print(food_info.head(3))
+# print(food_info.head(0))
 
 # display the last n line of the sample
-#print(food_info.tail(4))
+# print(food_info.tail(4))
 
-#display the sample columns
-#print(food_info.columns)
+# display the sample columns
+# print(food_info.columns)
 
 # check the sample structure
-#print(food_info.shape)
+# print(food_info.shape)
 
-#display the row x data
-#print(food_info.loc[0])
-#print(food_info.loc[3:6])
+# display the row x data
+# print(food_info.loc[0])
+# print(food_info.loc[3:6])
 
-#display the column x data
+# display the column x data
 # ndb_col = food_info["NDB_No"]
 # print(ndb_col)
 # columns = ["Zinc_(mg)", "Copper_(mg)"]
@@ -63,8 +63,9 @@ food_info = pandas.read_csv("food_info.csv")
 # print(food_info["Normalized_Fat"])
 
 #sort
-food_info.sort_values("Sodium_(mg)", inplace=True)
-print(food_info["Sodium_(mg)"])
+# food_info.sort_values("Sodium_(mg)", inplace=True)
+# print(food_info["Sodium_(mg)"])
+#
+# food_info.sort_values("Sodium_(mg)", inplace=True, ascending=False)
+# print(food_info["Sodium_(mg)"])
 
-food_info.sort_values("Sodium_(mg)", inplace=True, ascending=False)
-print(food_info["Sodium_(mg)"])
