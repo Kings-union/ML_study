@@ -42,6 +42,9 @@ def genData(numPoints, bias, variance):
         y[i] = (i + bias) + random.uniform(0, 1) * variance
     return x, y
 
+'''
+    Pearson correlation coefficient
+'''
 def computeCorrelation(X, Y):
     xBar = np.mean(X)
     yBar = np.mean(Y)

@@ -30,4 +30,4 @@ def correct(word):
     candidates = known([word]) or known(editsl(word)) or known_edits2(word) or [word]
     return max(candidates, key=lambda w: NWORDS[w])
 
-print correct('thanx')
+print correct('thi')
