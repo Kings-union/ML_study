@@ -1,0 +1,9 @@
+embeddings {
+  tensor_name: "embedding:0"
+  metadata_path: "/home/gwang/PycharmProjects/ML_study/tf_training/projector/projector/metadata.tsv"
+  sprite {
+    image_path: "/home/gwang/PycharmProjects/ML_study/tf_training/project/data/mnist_10k_sprite.png"
+    single_image_dim: 28
+    single_image_dim: 28
+  }
+}
