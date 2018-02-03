@@ -271,4 +271,141 @@ def my_grp_cnt(group_by, count_by):
 
         return  _cs1[org_idx]
 
+def calcDualKey(df,vn,vn2,key_src,key_tgt,vn_y,cred_k,mean0=None,add_count=False,fill_na=False):
+    if mean0 is None:
+        mean0 = df[vn_y].mean()
+
+    print("build src key")
+    _key_src = np.add(df[key_src].astype('string').values,df[vn].astype('string').value)
+    print("build tgt key")
+    _key_tgt = np.add(df[key_tgt].astype('string').values,df[vn].astype('string').value)
+
+    if vn2 is not None:
+        _key_src = np.add(_key_src,df[vn2].astype('string').value)
+        _key_tgt = np.add(_key_tgt.df[vn2].astype('string').value)
+
+    print("map to src key")
+    grp1 = df.groupby(_key_src)
+    sum1 = grp1[vn_y].aggregate(np.sum)
+    cnt1 = grp1[vn_y].aggregate(np.size)
+
+    print("map to tgt key")
+    vn_sum = 'sum_' + vn + '_' + vn2 + '_' + key_src + '_' + key_tgt
+    _sum = sum1[_key_tgt].values
+    _cnt = cnt1[_key_tgt].values
+
+    if fill_na:
+        print("fill in na")
+        _cnt[np.isnan(_sum)] = 0
+        _sum[np.isnan(_sum)] = 0
+
+    print("calc exp")
+    if vn2 is not None:
+        vn_yexp = 'exp_' + vn + '_' + vn2 + '_' + key_src + '_' + key_tgt
+    else:
+        vn_yexp = 'exp_' + vn + '_' + key_src + '_' + key_tgt
+    df[vn_yexp] = (_sum + cred_k * mean0) / (_cnt + cred_k)
+
+    if add_count:
+        print("add counts")
+        vn_cnt_src = 'cnt_' + vn + '_' + key_src
+        df[vn_cnt_src] = _cnt
+        grp2 = df.groupby(_key_tgt)
+        cnt2 = grp2[vn_y].aggregate(np.size)
+        _cnt2 = cnt2[_key_tgt].values
+        vn_cnt_tgt = 'cnt_' + vn + '_' + key_tgt
+        df[vn_cnt_tgt] = _cnt2
+
+def get_set_diff(df, vn, f1, f2):
+    #print(df[vn].values.sum())
+    set1 = set(np.unique(df[vn].values[f1]))
+    set2 = set(np.unique(df[vn].values[f2]))
+    set2_1 = set2 - set1
+    print vn, '\t', len(set1), '\t', len(set2), '\t', len(set2_1)
+    return len(set2_1) * 1.0 / len(set2)
+
+
+def calc_exptv(t0, vn_list, last_day_only=False, add_count=False):
+    t0a = t0.ix[:, ['day', 'click']].copy()
+    day_exps = {}
+
+    for vn in vn_list:
+        if vn == 'dev_id_ip':
+            t0a[vn] = pd.Series(np.add(t0.device_id.values , t0.device_ip.values)).astype('category').values.codes
+        elif vn == 'dev_ip_aw':
+            t0a[vn] = pd.Series(np.add(t0.device_ip.values , t0.app_or_web.astype('string').values)).astype('category').values.codes
+        elif vn == 'C14_aw':
+            t0a[vn] = pd.Series(np.add(t0.C14.astype('string').values , t0.app_or_web.astype('string').values)).astype('category').values.codes
+        elif vn == 'C17_aw':
+            t0a[vn] = pd.Series(np.add(t0.C17.astype('string').values , t0.app_or_web.astype('string').values)).astype('category').values.codes
+        elif vn == 'C21_aw':
+            t0a[vn] = pd.Series(np.add(t0.C21.astype('string').values , t0.app_or_web.astype('string').values)).astype('category').values.codes
+        elif vn == 'as_domain':
+            t0a[vn] = pd.Series(np.add(t0.app_domain.values , t0.site_domain.values)).astype('category').values.codes
+        elif vn == 'site_app_id':
+            t0a[vn] = pd.Series(np.add(t0.site_id.values , t0.app_id.values)).astype('category').values.codes
+        elif vn == 'app_model':
+            t0a[vn] = pd.Series(np.add(t0.app_id.values , t0.device_model.values)).astype('category').values.codes
+        elif vn == 'app_site_model':
+            t0a[vn] = pd.Series(np.add(t0.app_id.values , np.add(t0.site_id.values , t0.device_model.values))).astype('category').values.codes
+        elif vn == 'site_model':
+            t0a[vn] = pd.Series(np.add(t0.site_id.values , t0.device_model.values)).astype('category').values.codes
+        elif vn == 'app_site':
+            t0a[vn] = pd.Series(np.add(t0.app_id.values , t0.site_id.values)).astype('category').values.codes
+        elif vn == 'site_ip':
+            t0a[vn] = pd.Series(np.add(t0.site_id.values , t0.device_ip.values)).astype('category').values.codes
+        elif vn == 'app_ip':
+            t0a[vn] = pd.Series(np.add(t0.site_id.values , t0.device_ip.values)).astype('category').values.codes
+        elif vn == 'site_id_domain':
+            t0a[vn] = pd.Series(np.add(t0.site_id.values , t0.site_domain.values)).astype('category').values.codes
+        elif vn == 'site_hour':
+            t0a[vn] = pd.Series(np.add(t0.site_domain.values , (t0.hour.values % 100).astype('string'))).astype('category').values.codes
+        else:
+            t0a[vn] = t0[vn]
+
+        for day_v in xrange(22, 32):
+            cred_k = 10
+            if day_v not in day_exps:
+                day_exps[day_v] = {}
+
+            vn_key = vn
+
+            import time
+            _tstart = time.time()
+
+            day1 = 20
+            if last_day_only:
+                day1 = day_v - 2
+            filter_t = np.logical_and(t0.day.values > day1, t0.day.values <= day_v)
+            vn_key = vn
+            t1 = t0a.ix[filter_t, :].copy()
+            filter_t2 = np.logical_and(t1.day.values != day_v, t1.day.values < 31)
+
+            if vn == 'app_or_web':
+                day_exps[day_v][vn_key] = calcTVTransform(t1, vn, 'click', cred_k, filter_t2)
+            else:
+                if last_day_only:
+                    day_exps[day_v][vn_key] = calcTVTransform(t1, vn, 'click', cred_k, filter_t2, mean0=t0.expld_app_or_web.values)
+                else:
+                    day_exps[day_v][vn_key] = calcTVTransform(t1, vn, 'click', cred_k, filter_t2, mean0=t0.exptv_app_or_web.values)
+
+            print vn, vn_key, " ", day_v, " done in ", time.time() - _tstart
+        t0a.drop(vn, inplace=True, axis=1)
+
+    for vn in vn_list:
+        vn_key = vn
+
+        vn_exp = 'exptv_'+vn_key
+        if last_day_only:
+            vn_exp='expld_'+vn_key
+
+        t0[vn_exp] = np.zeros(t0.shape[0])
+        if add_count:
+            t0['cnttv_'+vn_key] = np.zeros(t0.shape[0])
+        for day_v in xrange(22, 32):
+            print vn, vn_key, day_v, t0.ix[t0.day.values == day_v, vn_exp].values.size, day_exps[day_v][vn_key]['exp'].size
+            t0.loc[t0.day.values == day_v, vn_exp]=day_exps[day_v][vn_key]['exp']
+            if add_count:
+                t0.loc[t0.day.values == day_v, 'cnttv_'+vn_key]=day_exps[day_v][vn_key]['cnt']
+
 
