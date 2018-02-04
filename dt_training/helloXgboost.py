@@ -1,4 +1,3 @@
-
 from numpy import loadtxt
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
@@ -19,8 +18,8 @@ model = XGBClassifier()
 print(model)
 eval_set = [(X_test,Y_test)]
 model.fit(X_train,Y_train,early_stopping_rounds=10,eval_metric="logloss",eval_set=eval_set,verbose=True)
-# plot_importance(model)
-# pyplot.show()
+plot_importance(model)
+pyplot.show()
 Y_pred = model.predict(X_test)
 predictions = [round(value) for value in Y_pred]
 accuracy = accuracy_score(Y_test,predictions)
