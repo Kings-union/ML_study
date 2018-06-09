@@ -1,7 +1,3 @@
-#################################################
-# 采用卷积神经网络LeNet
-#################################################
-
 # 加载测试数据的读写工具包，加载测试手写数据，目录MNIST_data是用来存放下载网络上的训练和测试数据的
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
