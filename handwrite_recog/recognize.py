@@ -9,6 +9,7 @@ def imageprepare():
     The imput is a png file location.
     """
     file_name = '/home/vmuser/Pictures/3.png'
+
     # in terminal 'mogrify -format png *.jpg' convert jpg to png
     im = Image.open(file_name).convert('1')
 
@@ -24,13 +25,12 @@ def imageprepare():
 
 
 
-    """
-    This function returns the predicted integer.
-    The imput is the pixel values from the imageprepare() function.
-    """
+"""
+This function returns the predicted integer.
+The imput is the pixel values from the imageprepare() function.
+"""
 
 # Define the model (same as when creating the model file)
-
 
 result = imageprepare()
 x = tf.placeholder(tf.float32, [None, 784])
